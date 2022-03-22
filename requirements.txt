@@ -3,3 +3,4 @@ numpy
 pyyaml
 tensorboard
 torch
+torchvision

@@ -213,12 +213,12 @@ class BasicTrainer(object):
             self.optimizer,
             last_epoch=self.cfgs.progress.start_epoch - 1,
             total_epoch=self.cfgs.progress.epoch,
-            **self.cfgs.optim.__dict__
+            **self.cfgs.optim.lr_scheduler.__dict__
         )
         self.logger.add_log('-' * 60)
         self.logger.add_log(
             'Optim Type - {}. Schedule Type - {}. Start lr - {}.'.format(
-                self.cfgs.optim.optim_type, self.cfgs.optim.lr_scheduler, self.cfgs.optim.lr
+                self.cfgs.optim.optim_type, self.cfgs.optim.lr_scheduler.type, self.cfgs.optim.lr
             )
         )
 
