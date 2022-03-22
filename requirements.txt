@@ -1,0 +1,5 @@
+loguru
+numpy
+pyyaml
+tensorboard
+torch
