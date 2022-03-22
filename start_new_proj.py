@@ -8,7 +8,7 @@ import os.path as osp
 from common.utils.file_utils import copy_files, replace_file
 
 CUSTOM_TRAINER_LINE_IDX = list(range(20))
-EVAL_LINE_IDX = list(range(15, 20))
+EVAL_LINE_IDX = list(range(10, 20))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

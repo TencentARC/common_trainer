@@ -1,6 +1,7 @@
 # A pytorch template for deep learning project
 An easy to use template for pytorch dl projects.
 
+## Start a new proj
 - Use `python start_new_proj.py --proj_name xx --proj_loc /path/to/proj_parent_dir` to extent to a new project.
 What you need to implement are the data, model, loss, metric, progress_img_saver.
 All other func for training and evaluation have been provided.
@@ -111,6 +112,8 @@ loss:
 
 ## Metric
 - Similar to Loss to calculate all metrics in once. But you don't need to set weights here, and no 'sum' is calculated.
+-
+- Add `@METRIC_REGISTRY.register()` to the class for registration.
 
 - When implementing metric, you have to put `inputs` to the `output` device. Refer to `custom.metric.custom_metric` for example.
 
