@@ -38,7 +38,9 @@ if __name__ == '__main__':
     copy_files(src_dir, proj_dir, subdir_name='experiments', file_names='.gitignore')
     copy_files(src_dir, proj_dir, subdir_name='results', file_names='.gitignore')
 
-    files = ['LICENSE', 'requirements.txt', 'setup.cfg', 'train.py', 'evaluate.py']
+    files = [
+        'LICENSE', 'requirements.txt', 'setup.cfg', 'train.py', 'evaluate.py', '.pre-commit-config.yaml', '.gitignore'
+    ]
     copy_files(src_dir, proj_dir, file_names=files)
     with open(osp.join(proj_dir, 'README.md'), 'w') as f:
         f.write('# {}\n'.format(args.proj_name))
