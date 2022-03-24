@@ -58,6 +58,9 @@ a different expr name like `xxx_finetune` for separation.
 - Some backbones/compents are provided in `common.models`.
 
 ## Dataset
+- `dir.data_dir` in config is the main data_dir for all dataset. Should not specify it for any single dataset.
+You should modify you `custom.xx_dataset.py` to make the address specified for you dataset.
+
 - You can add your dataset at `custom.datasets` with `xxx_dataset.py`.
 
 - Add `@DATASET_REGISTRY.register()` to the class for registration.

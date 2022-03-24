@@ -4,6 +4,7 @@
 import argparse
 import os
 import os.path as osp
+import shutil
 
 from common.utils.file_utils import copy_files, replace_file
 
@@ -42,6 +43,8 @@ if __name__ == '__main__':
     with open(osp.join(proj_dir, 'README.md'), 'w') as f:
         f.write('# {}\n'.format(args.proj_name))
 
+    # remove tests_common
+    shutil.rmtree(osp.join(proj_dir, 'tests', 'tests_common'))
     # renames
     replace_file(osp.join(proj_dir, 'LICENSE'), 'common_trainer', args.proj_name, line_idx=2)
     # custom/trainer/custom_trainer.py
