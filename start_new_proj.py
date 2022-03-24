@@ -47,8 +47,10 @@ if __name__ == '__main__':
 
     # remove tests_common
     shutil.rmtree(osp.join(proj_dir, 'tests', 'tests_common'))
+
     # renames
     replace_file(osp.join(proj_dir, 'LICENSE'), 'common_trainer', args.proj_name, line_idx=2)
+
     # custom/trainer/custom_trainer.py
     proj_name_lower = args.proj_name.lower()
     custom_dir = osp.join(proj_dir, proj_name_lower)
@@ -60,16 +62,19 @@ if __name__ == '__main__':
         line_idx=CUSTOM_TRAINER_LINE_IDX
     )
     os.rename(custom_trainer, custom_trainer.replace('custom', proj_name_lower))
+
     # __init__
     dirs = ['datasets', 'loss', 'metric', 'models']
     for dir in dirs:
         init_file = osp.join(custom_dir, dir, '__init__.py')
         replace_file(init_file, 'custom.', proj_name_lower + '.')
+
     # train.py
     replace_file(
         osp.join(proj_dir, 'train.py'), ['CustomTrainer', 'custom.', 'custom_'],
         [trainer_class_name + 'Trainer', proj_name_lower + '.', proj_name_lower + '_']
     )
+
     # evaluate.py
     replace_file(osp.join(proj_dir, 'evaluate.py'), ['custom.'], [proj_name_lower + '.'], line_idx=EVAL_LINE_IDX)
 
