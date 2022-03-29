@@ -122,11 +122,14 @@ def extract_video_ffmpeg(path, dst_folder, max_name_len=6, ext='.png', max_count
 def get_video_metadata(path):
     """
     Get the metadata of a video.
+
     :param path: video path
-    :return length:  number of frames
-            width:   frame width
-            height:  frame height
-            fps:     video fps
+
+    Returns：
+           - length -  number of frames
+           - width -   frame width
+           - height -  frame height
+           - fps -     video fps
     """
     assert osp.exists(path), 'No video file at {}'.format(path)
 

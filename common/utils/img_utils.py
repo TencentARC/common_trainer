@@ -54,8 +54,6 @@ def img_scale(img, scale, interpolation=None):
 def img_to_uint8(img, transpose=None, std=None, mean=None, norm_by_255=True, rgb2bgr=True):
     """To revert a img in float type to uint8 for visualization
        Will do std -> mean -> norm_by_255 -> rgb2bgr in order
-    Parameters
-    ----------
     :param img: numpy array in (H, W, 3) shape
     :param transpose: Tuple
         permute the axes order if not None.
