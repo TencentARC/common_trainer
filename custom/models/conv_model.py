@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from common.models.base_model import BaseModel
-from common.models.compents import ConvBNRelu
+from common.models.components import ConvBNRelu
 from common.utils.registry import MODEL_REGISTRY
 
 
