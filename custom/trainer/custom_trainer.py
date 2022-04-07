@@ -3,6 +3,7 @@
 import torch
 
 from common.trainer.basic_trainer import BasicTrainer
+from common.utils.cfgs_utils import valid_key_in_cfgs, get_value_from_cfgs_field
 from common.utils.img_utils import img_to_uint8
 from custom.datasets import get_dataset
 from custom.datasets.transform.augmentation import get_transforms
@@ -40,19 +41,16 @@ class CustomTrainer(BasicTrainer):
         data['train'], data['train_sampler'] = self.set_dataset('train', tkwargs)
 
         # val
-        if not hasattr(self.cfgs.dataset, 'val') or self.cfgs.dataset.val is None:
+        if not valid_key_in_cfgs(self.cfgs.dataset, 'val'):
             data['val'] = None
         else:
             data['val'], data['val_sampler'] = self.set_dataset('val', tkwargs)
 
         # eval
-        if not hasattr(self.cfgs.dataset, 'eval') or self.cfgs.dataset.eval is None:
+        if not valid_key_in_cfgs(self.cfgs.dataset, 'eval'):
             data['eval'] = None
         else:
-            if not hasattr(self.cfgs.dataset.eval, 'eval_batch_size') or self.cfgs.dataset.eval.eval_batch_size is None:
-                eval_bs = 1
-            else:
-                eval_bs = self.cfgs.dataset.eval.eval_batch_size
+            eval_bs = get_value_from_cfgs_field(self.cfgs.dataset.eval, 'eval_batch_size', 1)
             tkwargs_eval = {
                 'batch_size': eval_bs,
                 'num_workers': self.cfgs.worker,

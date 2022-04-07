@@ -3,6 +3,7 @@
 import torchvision.transforms as transforms
 
 from common.datasets.transform.augmentation import (ColorJitter, ImgNorm, PermuteImg)
+from common.utils.cfgs_utils import valid_key_in_cfgs
 
 
 def get_transforms(cfgs):
@@ -10,8 +11,8 @@ def get_transforms(cfgs):
     transforms_list = []
     aug_info = ''
 
-    if hasattr(cfgs, 'augmentation') and cfgs.augmentation is not None:
-        if hasattr(cfgs.augmentation, 'jitter') and cfgs.augmentation.jitter is not None:
+    if valid_key_in_cfgs(cfgs, 'augmentation'):
+        if valid_key_in_cfgs(cfgs.augmentation, 'jitter'):
             transforms_list.append(ColorJitter(cfgs.augmentation.jitter))
             aug_info += '  Add ColorJitter with level {}\n'.format(cfgs.augmentation.jitter)
 
