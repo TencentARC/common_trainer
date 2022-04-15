@@ -106,8 +106,9 @@ class CustomTrainer(BasicTrainer):
          Return a dict with list of image and filename. filenames should be irrelevant to progress
          Image should be in bgr with shape(h,w,3), which can be directly writen by cv.imwrite().
          Return None will not write anything.
+         You should clone anything from input/output to forbid change of value
         """
-        img = inputs['img'][0].detach().cpu().numpy()
+        img = inputs['img'][0].clone().detach().cpu().numpy()
 
         img = img_to_uint8(img, transpose=[1, 2, 0])
         name = ['sample1', 'sample2']

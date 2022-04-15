@@ -61,8 +61,10 @@ if __name__ == '__main__':
 
     # get_render_img
     def render_eval_img(inputs, output):
-        """Render eval img and return a dict containing name and images for each batch"""
-        img = inputs['img'][0].detach().cpu().numpy()
+        """Render eval img and return a dict containing name and images for each batch.
+        You should clone anything from input/output to forbid change of value.
+        """
+        img = inputs['img'][0].clone().detach().cpu().numpy()
 
         img = img_to_uint8(img, transpose=[1, 2, 0])
         name = ['sample1', 'sample2']
