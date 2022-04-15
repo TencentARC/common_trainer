@@ -45,6 +45,9 @@ if __name__ == '__main__':
     with open(osp.join(proj_dir, 'README.md'), 'w') as f:
         f.write('# {}\n'.format(args.proj_name))
 
+    # copy readme
+    shutil.copyfile(osp.join(src_dir, 'README.md'), osp.join(proj_dir, 'docs', 'common_trainer.md'))
+
     # remove tests_common
     shutil.rmtree(osp.join(proj_dir, 'tests', 'tests_common'))
 
