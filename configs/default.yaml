@@ -45,6 +45,7 @@ progress:
     epoch: 100                      # Num of epoch for training
     save_time: 1800                 # save model after this time(in second). By default 30min
 
+    epoch_loss: 1                   # Num of epoch to display loss
     iter_loss: 10                   # Num of iteration to display loss
     save_progress: True             # Whether to save progress during training
     epoch_save_progress: 1          # Num of epoch for saving progress
