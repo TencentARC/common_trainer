@@ -4,13 +4,13 @@ import torch
 
 from common.trainer.basic_trainer import BasicTrainer
 from common.utils.cfgs_utils import valid_key_in_cfgs, get_value_from_cfgs_field
-from common.utils.img_utils import img_to_uint8
-from custom.datasets import get_dataset
+from custom.datasets import get_dataset, get_model_feed_in
 from custom.datasets.transform.augmentation import get_transforms
 from custom.eval.eval_func import run_eval
 from custom.loss import build_loss
 from custom.metric import build_metric
 from custom.models import build_model
+from custom.visual.render_img import render_progress_imgs, write_progress_imgs
 
 
 class CustomTrainer(BasicTrainer):
@@ -93,28 +93,16 @@ class CustomTrainer(BasicTrainer):
 
     def get_model_feed_in(self, inputs, device):
         """Get the core model feed in and put it to the model's device"""
-        feed_in = inputs['img']
-        if device == 'gpu':
-            feed_in = feed_in.cuda(non_blocking=True)
+        return get_model_feed_in(inputs, device)
 
-        batch_size = inputs['img'].shape[0]
-
-        return feed_in, batch_size
-
-    def render_progress_img(self, inputs, output):
+    def render_progress_imgs(self, inputs, output):
         """Actual render for progress image with label. It is perform in each step with a batch.
          Return a dict with list of image and filename. filenames should be irrelevant to progress
          Image should be in bgr with shape(h,w,3), which can be directly writen by cv.imwrite().
          Return None will not write anything.
          You should clone anything from input/output to forbid change of value
         """
-        img = inputs['img'][0].clone().detach().cpu().numpy()
-
-        img = img_to_uint8(img, transpose=[1, 2, 0])
-        name = ['sample1', 'sample2']
-        dic = {'names': name, 'imgs': [img] * 2}
-
-        return dic
+        return render_progress_imgs(inputs, output)
 
     def evaluate(self, data, model, metric_summary, device, max_samples_eval):
         """Actual eval function for the model. Use run_eval since we want to run it locally as well"""
@@ -126,9 +114,13 @@ class CustomTrainer(BasicTrainer):
             self.eval_metric,
             metric_summary,
             device,
-            self.render_progress_img,
+            self.render_progress_imgs,
             max_samples_eval,
             show_progress=False
         )
 
         return metric_info, files
+
+    def write_progress_imgs(self, files, folder, epoch=None, step=None, global_step=None, eval=False):
+        """Actual function to write the progress images"""
+        write_progress_imgs(files, folder, epoch, step, global_step, eval)

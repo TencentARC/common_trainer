@@ -2,21 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import os
-import os.path as osp
 
-import cv2
 import torch
 
 from common.metric.metric_dict import MetricDictCounter
 from common.utils.cfgs_utils import parse_configs, get_value_from_cfgs_field
-from common.utils.img_utils import img_to_uint8
 from common.utils.logger import Logger
 from common.utils.model_io import load_model
-from custom.datasets import get_dataset
+from custom.datasets import get_dataset, get_model_feed_in
 from custom.datasets.transform.augmentation import get_transforms
 from custom.eval.eval_func import run_eval
 from custom.metric import build_metric
 from custom.models import build_model
+from custom.visual.render_img import render_progress_imgs, write_progress_imgs
 
 if __name__ == '__main__':
     cfgs = parse_configs()
@@ -48,30 +46,6 @@ if __name__ == '__main__':
 
     loader = torch.utils.data.DataLoader(dataset, **tkwargs_eval)
 
-    # get_model_feed_in_func
-    def get_model_feed_in(data, device):
-        """Get core model feed in."""
-        feed_in = data['img']
-        if device == 'gpu':
-            feed_in = feed_in.cuda(non_blocking=True)
-
-        batch_size = data['img'].shape[0]
-
-        return feed_in, batch_size
-
-    # get_render_img
-    def render_eval_img(inputs, output):
-        """Render eval img and return a dict containing name and images for each batch.
-        You should clone anything from input/output to forbid change of value.
-        """
-        img = inputs['img'][0].clone().detach().cpu().numpy()
-
-        img = img_to_uint8(img, transpose=[1, 2, 0])
-        name = ['sample1', 'sample2']
-        dic = {'names': name, 'imgs': [img] * 2}
-
-        return dic
-
     # set and load model
     assert cfgs.model_pt is not None, 'Please specify the model_pt for evaluation...'
     model = build_model(cfgs, logger)
@@ -86,7 +60,7 @@ if __name__ == '__main__':
 
     # eval
     metric_info, files = run_eval(
-        loader, get_model_feed_in, model, logger, eval_metric, metric_dict, device, render_eval_img,
+        loader, get_model_feed_in, model, logger, eval_metric, metric_dict, device, render_progress_imgs,
         cfgs.progress.max_samples_eval
     )
 
@@ -95,14 +69,8 @@ if __name__ == '__main__':
         logger.add_log('Not evaluation perform...', level='warning')
         exit()
 
-    if files is not None and len(files) > 0:
-        # write down a list of rendered outputs in eval_dir
-        for img_name in files[0]['names']:
-            os.makedirs(osp.join(eval_dir, img_name), exist_ok=True)
-        for idx, file in enumerate(files):
-            for name, img in zip(file['names'], file['imgs']):
-                img_path = osp.join(eval_dir, name, 'eval_{:04d}.png'.format(idx))
-                cv2.imwrite(img_path, img)
+    if files is not None:
+        write_progress_imgs(files, eval_dir, eval=True)
         logger.add_log('Visual results add to {}'.format(eval_dir))
 
     logger.add_log('Evaluation Benchmark result. \n {}'.format(metric_info))
