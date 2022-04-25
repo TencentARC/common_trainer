@@ -60,6 +60,8 @@ class BasicTrainer(object):
 
         # loss
         self.loss_factory = self.set_loss_factory()
+
+        # monitor
         self.monitor = self.set_monitor()
 
         # metric
