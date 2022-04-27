@@ -463,16 +463,16 @@ class BasicTrainer(object):
         loss_summary = LossDictCounter()
         count = 0
         global_step = (epoch + 1) * step_in_epoch
-        for step, inputs in enumerate(self.data['val']):
-            with torch.no_grad():
+        with torch.no_grad():
+            for step, inputs in enumerate(self.data['val']):
                 feed_in, batch_size = self.get_model_feed_in(inputs, self.device)
                 output = self.model(feed_in)
-            if self.cfgs.progress.save_progress_val and step < self.cfgs.progress.max_samples_val:  # Just some samples
-                self.save_progress(epoch, 0, global_step, inputs, output, mode='val')
+                if self.cfgs.progress.save_progress_val and step < self.cfgs.progress.max_samples_val:
+                    self.save_progress(epoch, 0, global_step, inputs, output, mode='val')
 
-            count += batch_size
-            loss = self.calculate_loss(inputs, output)
-            loss_summary(loss, batch_size)
+                count += batch_size
+                loss = self.calculate_loss(inputs, output)
+                loss_summary(loss, batch_size)
 
         if count == 0:
             self.logger.add_log('No batch was sent to valid...')
