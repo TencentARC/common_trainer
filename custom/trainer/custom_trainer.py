@@ -73,7 +73,9 @@ class CustomTrainer(BasicTrainer):
             sampler = torch.utils.data.distributed.DistributedSampler(
                 dataset, num_replicas=self.cfgs.dist.world_size, rank=self.cfgs.dist.rank
             )
-        loader = torch.utils.data.DataLoader(dataset, sampler=sampler, shuffle=(sampler is None), **tkwargs)
+        loader = torch.utils.data.DataLoader(
+            dataset, sampler=sampler, shuffle=(sampler is None and mode != 'eval'), **tkwargs
+        )
 
         return loader, sampler
 
