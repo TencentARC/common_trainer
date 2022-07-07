@@ -48,9 +48,6 @@ if __name__ == '__main__':
     # copy readme
     shutil.copyfile(osp.join(src_dir, 'README.md'), osp.join(proj_dir, 'docs', 'common_trainer.md'))
 
-    # remove tests_common
-    shutil.rmtree(osp.join(proj_dir, 'tests', 'tests_common'))
-
     # renames
     replace_file(osp.join(proj_dir, 'LICENSE'), 'common_trainer', args.proj_name, line_idx=2)
 
