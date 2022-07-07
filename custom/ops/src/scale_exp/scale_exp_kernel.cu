@@ -63,26 +63,26 @@ __global__ void backward_kernel(
     const torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> A,
     const float scale,
     const float bias,
-    torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> output) {
+    torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> grad_A) {
     const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;
     const uint32_t n = blockIdx.y;
 
     if (c < A.size(1)) {  // num block may create some useless thread
-        output[n][c] = - scale * exp(-A[n][c]) * grad_out[n][c];   // with the help of PackedTensorAccessor
+        grad_A[n][c] = - scale * exp(-A[n][c]) * grad_out[n][c];   // with the help of PackedTensorAccessor
     }
 }
 
 
 /* CUDA instantiate func for scale_exp backward
-   @param: grad, torch float tensor of (B, N), final grad
+   @param: grad_out, torch float tensor of (B, N), final grad
    @param: A, torch float tensor of (B, N)
    @param: scale, float num
    @param: bias, float num
-   @return: output, torch float tensor with the same size as A
+   @return: grad_A, torch float tensor with the same size as A
 */
 torch::Tensor scale_exp_backward_cuda(
     torch::Tensor grad_out, torch::Tensor A, const float scale, const float bias) {
-    torch::Tensor output = torch::zeros_like(A);  // space for output
+    torch::Tensor grad_A = torch::zeros_like(A);  // space for output
 
     const uint32_t n_row = A.size(0);  // B
     const uint32_t n_col = A.size(1);  // N
@@ -96,9 +96,9 @@ torch::Tensor scale_exp_backward_cuda(
             grad_out.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>(),
             A.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>(),
             scale, bias,
-            output.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>()
+            grad_A.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>()
         );
     }));
 
-    return output;
+    return grad_A;
 }
