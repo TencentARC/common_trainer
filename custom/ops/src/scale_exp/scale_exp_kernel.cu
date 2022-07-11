@@ -18,10 +18,10 @@ __global__ void forward_kernel(
     const float scale,
     const float bias,
     torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> output) {
-    const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;
-    const uint32_t n = blockIdx.y;
+    const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;  // col id
+    const uint32_t n = blockIdx.y * blockDim.y + threadIdx.y;  // row id
 
-    if (c < A.size(1)) {  // num block may create some useless thread
+    if (n < A.size(0) && c < A.size(1)) {  // num block may create some useless thread
         output[n][c] = scale * exp(- A[n][c]) + bias;   // with the help of PackedTensorAccessor
     }
 }
@@ -39,8 +39,9 @@ torch::Tensor scale_exp_forward_cuda(
 
     const uint32_t n_row = A.size(0);  // B
     const uint32_t n_col = A.size(1);  // N
-    const uint32_t threads = 1024;  // You should set the num_threads for parallelization
-    const dim3 blocks(div_round_up(n_col, threads), n_row);  // 2-dim block to cover all elements
+    const dim3 threads(32, 32);  // 2d-block
+    const uint32_t thread_per_dim = 32;
+    const dim3 blocks(div_round_up(n_col, thread_per_dim), div_round_up(n_row, thread_per_dim));  // 2d-grid
 
     // instantiate the real executable kernel
     AT_DISPATCH_FLOATING_TYPES(A.scalar_type(), "scale_exp_forward_cuda",  // this will switch actual scalar type
@@ -64,10 +65,10 @@ __global__ void backward_kernel(
     const float scale,
     const float bias,
     torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> grad_A) {
-    const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;
-    const uint32_t n = blockIdx.y;
+    const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;  // col id
+    const uint32_t n = blockIdx.y * blockDim.y + threadIdx.y;  // row id
 
-    if (c < A.size(1)) {  // num block may create some useless thread
+    if (n < A.size(0) && c < A.size(1)) {  // num block may create some useless thread
         grad_A[n][c] = - scale * exp(-A[n][c]) * grad_out[n][c];   // with the help of PackedTensorAccessor
     }
 }
@@ -86,8 +87,9 @@ torch::Tensor scale_exp_backward_cuda(
 
     const uint32_t n_row = A.size(0);  // B
     const uint32_t n_col = A.size(1);  // N
-    const uint32_t threads = 1024;  // You should set the num_threads for parallelization
-    const dim3 blocks(div_round_up(n_col, threads), n_row);  // 2-dim block to cover all elements
+    const dim3 threads(32, 32);  // 2d-block
+    const uint32_t thread_per_dim = 32;
+    const dim3 blocks(div_round_up(n_col, thread_per_dim), div_round_up(n_row, thread_per_dim));  // 2d-grid
 
     // instantiate the real executable kernel
     AT_DISPATCH_FLOATING_TYPES(A.scalar_type(), "scale_exp_backward_cuda",  // this will switch actual scalar type

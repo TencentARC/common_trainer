@@ -23,10 +23,10 @@ __global__ void forward_kernel(
     const torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> A,
     const torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> B,
     torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> output) {
-    const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;
-    const uint32_t n = blockIdx.y;
+    const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;  // col id
+    const uint32_t n = blockIdx.y * blockDim.y + threadIdx.y;  // row id
 
-    if (c < A.size(1)) {  // num block may create some useless thread
+    if (n < A.size(0) && c < A.size(1)) {  // num block may create some useless thread
         output[n][c] = identity(A[n][c] + B[n][c]);   // with the help of PackedTensorAccessor
     }
 }
@@ -42,9 +42,9 @@ torch::Tensor add_matrix_forward_cuda(torch::Tensor A, torch::Tensor B) {
 
     const uint32_t n_row = A.size(0);  // B
     const uint32_t n_col = A.size(1);  // N
-    const uint32_t threads = 1024;  // You should set the num_threads for parallelization
-    const dim3 blocks(div_round_up(n_col, threads), n_row);  // 2-dim block to cover all elements
-    // const int blocks = div_round_up(n_row * n_col, threads); // 1-dim block is also allowed, but not easy to fine idx
+    const dim3 threads(32, 32);  // 2d-block
+    const uint32_t thread_per_dim = 32;
+    const dim3 blocks(div_round_up(n_col, thread_per_dim), div_round_up(n_row, thread_per_dim));  // 2d-grid
 
     // instantiate the real executable kernel
     AT_DISPATCH_FLOATING_TYPES(A.scalar_type(), "add_matrix_forward_cuda",  // this will switch actual scalar type

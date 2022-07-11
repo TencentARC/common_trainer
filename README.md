@@ -216,6 +216,10 @@ A python wrapper is suggested to put under `custom/ops/func.py` to use the func 
 - stride = blockDim.x = total num of thread in a block. Commonly a block can be used to handle one batch.
 - stride = blockDim.x * gridDim.x  = total num of thread in a grid
   - use this is called `grid-stride loop`
+#### 2d and 1d
+- 2d/1d grid/block are all supported based on your input tensor shape.
+- Ref to [doc1](http://www.mathcs.emory.edu/~cheung/Courses/355/Syllabus/94-CUDA/2D-grids.html) and
+and [doc2](https://blog.csdn.net/canhui_wang/article/details/51730264) for detail.
 
 ### PackedAccessor
 To put a tensor into cuda kernel, it uses

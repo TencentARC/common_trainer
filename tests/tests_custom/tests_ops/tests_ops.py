@@ -37,7 +37,6 @@ class TestDict(unittest.TestCase):
             if isinstance(grad_torch, list):
                 for grad, _grad in zip(grad_torch, grad_custom):
                     if isinstance(grad, torch.Tensor):
-                        print(torch.abs(grad - _grad).max())
                         self.assertTrue(torch.allclose(grad, _grad, atol=atol))
             else:
                 if isinstance(grad_torch, torch.Tensor):
