@@ -22,15 +22,26 @@ class TestDict(unittest.TestCase):
     def setUpClass(cls):
         cls.logger = Logger(path=osp.join(RESULT_DIR, './benchmark.txt'), keep_console=False)
 
-    def check_output_and_grad(self, out_torch, out_custom, grad_torch, grad_custom):
+    def check_output_and_grad(self, out_torch, out_custom, grad_torch, grad_custom, atol=1e-5):
         """Check the output and grad"""
         if out_torch is not None:
-            for out, out_custom in zip(out_torch, out_custom):
-                self.assertTrue(torch.allclose(out, out_custom))
+            if isinstance(out_torch, list):
+                for out, _out in zip(out_torch, out_custom):
+                    if isinstance(out, torch.Tensor):
+                        self.assertTrue(torch.allclose(out, _out, atol=atol))
+            else:
+                if isinstance(out_torch, torch.Tensor):
+                    self.assertTrue(torch.allclose(out_torch, out_custom, atol=atol))
 
         if grad_torch is not None:
-            for grad, grad_custom in zip(grad_torch, grad_custom):
-                self.assertTrue(torch.allclose(grad, grad_custom))
+            if isinstance(grad_torch, list):
+                for grad, _grad in zip(grad_torch, grad_custom):
+                    if isinstance(grad, torch.Tensor):
+                        print(torch.abs(grad - _grad).max())
+                        self.assertTrue(torch.allclose(grad, _grad, atol=atol))
+            else:
+                if isinstance(grad_torch, torch.Tensor):
+                    self.assertTrue(torch.allclose(grad_torch, grad_custom, atol=atol))
 
     def tests_add_matrix(self):
         inputs = [

@@ -83,7 +83,10 @@ def log_custom_benchmark(logger, func_name, torch_func, custom_fuc, inputs, n_it
         # log the grad
         grad_torch = []
         for input in inputs:
-            grad_torch.append(input.grad.clone())
+            if isinstance(input, torch.Tensor):
+                grad_torch.append(input.grad.clone())
+            else:
+                grad_torch.append(None)
 
         # zeros the grad
         for input in inputs:
@@ -127,7 +130,10 @@ def log_custom_benchmark(logger, func_name, torch_func, custom_fuc, inputs, n_it
     # log the grad
     grad_custom = []
     for input in inputs:
-        grad_custom.append(input.grad.clone())
+        if isinstance(input, torch.Tensor):
+            grad_custom.append(input.grad.clone())
+        else:
+            grad_custom.append(None)
 
     logger.add_log('_' * 60)
     logger.add_log('\n')
