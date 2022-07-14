@@ -6,6 +6,7 @@ import os.path as osp
 import unittest
 
 import torch
+from torch.autograd import gradcheck
 
 from . import log_custom_benchmark
 from common.utils.logger import Logger
@@ -44,8 +45,8 @@ class TestDict(unittest.TestCase):
 
     def tests_add_matrix(self):
         inputs = [
-            torch.rand((1000, 2000), dtype=torch.float32, requires_grad=True),
-            torch.rand((1000, 2000), dtype=torch.float32, requires_grad=True)
+            torch.rand((1000, 2000), dtype=torch.double, requires_grad=True),
+            torch.rand((1000, 2000), dtype=torch.double, requires_grad=True)
         ]
 
         def add_matrix_torch(x, y):
@@ -60,7 +61,7 @@ class TestDict(unittest.TestCase):
         self.check_output_and_grad(out_torch, out_custom, grad_torch, grad_custom)
 
     def tests_scale_exp(self):
-        inputs = [torch.rand((1000, 2000), dtype=torch.float32, requires_grad=True)]
+        inputs = [torch.rand((1000, 2000), dtype=torch.double, requires_grad=True)]
 
         scale = 3.3
         bias = 2.89
@@ -75,3 +76,26 @@ class TestDict(unittest.TestCase):
         )
 
         self.check_output_and_grad(out_torch, out_custom, grad_torch, grad_custom)
+
+    def tests_gradcheck_add_matrix(self):
+        if not torch.cuda.is_available():
+            return
+
+        inputs = (
+            torch.rand((10, 20), dtype=torch.double,
+                       requires_grad=True).cuda(), torch.rand((10, 20), dtype=torch.double, requires_grad=True).cuda()
+        )
+
+        add_matrix_custom = AddMatrix().cuda()
+
+        self.assertTrue(gradcheck(add_matrix_custom, inputs, eps=1e-6, atol=1e-8))
+
+    def tests_gradcheck_scale_exp(self):
+        if not torch.cuda.is_available():
+            return
+
+        inputs = torch.rand((10, 20), dtype=torch.double, requires_grad=True).cuda()
+
+        scale_exp_custom = ScaleExp(3.3, 2.89).cuda()
+
+        self.assertTrue(gradcheck(scale_exp_custom, inputs, eps=1e-6, atol=1e-8))
