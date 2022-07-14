@@ -23,7 +23,7 @@ class TestDict(unittest.TestCase):
     def setUpClass(cls):
         cls.logger = Logger(path=osp.join(RESULT_DIR, './benchmark.txt'), keep_console=False)
 
-    def check_output_and_grad(self, out_torch, out_custom, grad_torch, grad_custom, atol=1e-5):
+    def check_output_and_grad(self, out_torch, out_custom, grad_torch, grad_custom, atol=1e-8):
         """Check the output and grad"""
         if out_torch is not None:
             if isinstance(out_torch, list):
