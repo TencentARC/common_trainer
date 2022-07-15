@@ -86,7 +86,7 @@ class TestDict(unittest.TestCase):
                        requires_grad=True).cuda(), torch.rand((10, 20), dtype=torch.double, requires_grad=True).cuda()
         )
 
-        add_matrix_custom = AddMatrix().cuda()
+        add_matrix_custom = AddMatrix()
 
         self.assertTrue(gradcheck(add_matrix_custom, inputs, eps=1e-6, atol=1e-8))
 
@@ -96,6 +96,6 @@ class TestDict(unittest.TestCase):
 
         inputs = torch.rand((10, 20), dtype=torch.double, requires_grad=True).cuda()
 
-        scale_exp_custom = ScaleExp(3.3, 2.89).cuda()
+        scale_exp_custom = ScaleExp(3.3, 2.89)
 
         self.assertTrue(gradcheck(scale_exp_custom, inputs, eps=1e-6, atol=1e-8))
