@@ -1,3 +1,9 @@
+// Copyright 2022 Tencent Inc. All rights reserved.
+//
+// Author: leoyluo@tencent.com (Yue Luo)
+//
+// add two tensor, C = A + B
+
 #include <torch/extension.h>
 #include <torch/torch.h>
 
@@ -23,7 +29,7 @@ torch::Tensor add_matrix_forward_cuda(torch::Tensor A, torch::Tensor B);
    @return: output, torch float tensor with the same size as A
 */
 torch::Tensor add_matrix_forward(torch::Tensor A, torch::Tensor B) {
-    //checking
+    // checking
     CHECK_INPUT(A)
     CHECK_INPUT(B)
 
@@ -43,7 +49,7 @@ torch::Tensor add_matrix_forward(torch::Tensor A, torch::Tensor B) {
    @return: grad_A, grad_B, vector of torch float tensor with the same size as A, B
 */
 std::vector<torch::Tensor> add_matrix_backward(torch::Tensor grad_out, torch::Tensor A, torch::Tensor B) {
-    //checking
+    // checking
     CHECK_INPUT(A)
     CHECK_INPUT(B)
     CHECK_INPUT(grad_out)

@@ -8,9 +8,9 @@ import unittest
 import torch
 from torch.autograd import gradcheck
 
-from . import log_custom_benchmark
 from common.utils.logger import Logger
 from custom.ops import AddMatrix, ScaleExp
+from . import log_custom_benchmark
 
 RESULT_DIR = osp.abspath(osp.join(__file__, '..', 'results'))
 os.makedirs(RESULT_DIR, exist_ok=True)

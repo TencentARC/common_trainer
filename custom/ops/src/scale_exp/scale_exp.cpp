@@ -1,3 +1,9 @@
+// Copyright 2022 Tencent Inc. All rights reserved.
+//
+// Author: leoyluo@tencent.com (Yue Luo)
+//
+// transformation of one tensor, C = s * exp(-A) + b
+
 #include <torch/extension.h>
 #include <torch/torch.h>
 
@@ -24,7 +30,7 @@ torch::Tensor scale_exp_forward_cuda(torch::Tensor A, const float scale, const f
    @return: output, torch float tensor with the same size as A
 */
 torch::Tensor scale_exp_forward(torch::Tensor A, const float scale, const float bias) {
-    //checking
+    // checking
     CHECK_INPUT(A)
     CHECK_IS_FLOATING(A)
 
@@ -51,7 +57,7 @@ torch::Tensor scale_exp_backward(
     torch::Tensor A,
     const float scale,
     const float bias) {
-    //checking
+    // checking
     CHECK_INPUT(A)
     CHECK_INPUT(grad_out)
 
