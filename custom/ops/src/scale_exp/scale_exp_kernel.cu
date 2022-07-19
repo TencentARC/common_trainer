@@ -14,15 +14,15 @@ __host__ __device__ T div_round_up(T val, T divisor) {
 // The real cuda forward_kernel
 template <typename scalar_t>
 __global__ void forward_kernel(
-    const torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> A,
+    const torch::PackedTensorAccessor32<scalar_t, 2, torch::RestrictPtrTraits> A,
     const float scale,
     const float bias,
-    torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> output) {
+    torch::PackedTensorAccessor32<scalar_t, 2, torch::RestrictPtrTraits> output) {
     const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;  // col id
     const uint32_t n = blockIdx.y * blockDim.y + threadIdx.y;  // row id
 
     if (n < A.size(0) && c < A.size(1)) {  // num block may create some useless thread
-        output[n][c] = scale * exp(- A[n][c]) + bias;   // with the help of PackedTensorAccessor
+        output[n][c] = scale * exp(- A[n][c]) + bias;   // with the help of PackedTensorAccessor32
     }
 }
 
@@ -47,9 +47,9 @@ torch::Tensor scale_exp_forward_cuda(
     AT_DISPATCH_FLOATING_TYPES(A.scalar_type(), "scale_exp_forward_cuda",  // this will switch actual scalar type
     ([&] {
         forward_kernel<scalar_t><<<blocks, threads>>>(
-            A.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>(),
+            A.packed_accessor32<scalar_t, 2, torch::RestrictPtrTraits>(),
             scale, bias,
-            output.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>()
+            output.packed_accessor32<scalar_t, 2, torch::RestrictPtrTraits>()
         );
     }));
 
@@ -60,16 +60,16 @@ torch::Tensor scale_exp_forward_cuda(
 // The real cuda backward_kernel
 template <typename scalar_t>
 __global__ void backward_kernel(
-    const torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> grad_out,
-    const torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> A,
+    const torch::PackedTensorAccessor32<scalar_t, 2, torch::RestrictPtrTraits> grad_out,
+    const torch::PackedTensorAccessor32<scalar_t, 2, torch::RestrictPtrTraits> A,
     const float scale,
     const float bias,
-    torch::PackedTensorAccessor<scalar_t, 2, torch::RestrictPtrTraits, size_t> grad_A) {
+    torch::PackedTensorAccessor32<scalar_t, 2, torch::RestrictPtrTraits> grad_A) {
     const uint32_t c = blockIdx.x * blockDim.x + threadIdx.x;  // col id
     const uint32_t n = blockIdx.y * blockDim.y + threadIdx.y;  // row id
 
     if (n < A.size(0) && c < A.size(1)) {  // num block may create some useless thread
-        grad_A[n][c] = - scale * exp(-A[n][c]) * grad_out[n][c];   // with the help of PackedTensorAccessor
+        grad_A[n][c] = - scale * exp(-A[n][c]) * grad_out[n][c];   // with the help of PackedTensorAccessor32
     }
 }
 
@@ -95,10 +95,10 @@ torch::Tensor scale_exp_backward_cuda(
     AT_DISPATCH_FLOATING_TYPES(A.scalar_type(), "scale_exp_backward_cuda",  // this will switch actual scalar type
     ([&] {
         backward_kernel<scalar_t><<<blocks, threads>>>(
-            grad_out.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>(),
-            A.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>(),
+            grad_out.packed_accessor32<scalar_t, 2, torch::RestrictPtrTraits>(),
+            A.packed_accessor32<scalar_t, 2, torch::RestrictPtrTraits>(),
             scale, bias,
-            grad_A.packed_accessor<scalar_t, 2, torch::RestrictPtrTraits, size_t>()
+            grad_A.packed_accessor32<scalar_t, 2, torch::RestrictPtrTraits>()
         );
     }));
 

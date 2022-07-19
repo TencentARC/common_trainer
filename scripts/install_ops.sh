@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd ./custom/ops
-python setup.py install
+MAX_JOBS=4 python setup.py install
 cd ../..
