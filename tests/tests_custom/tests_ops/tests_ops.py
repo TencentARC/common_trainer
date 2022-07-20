@@ -23,16 +23,18 @@ class TestDict(unittest.TestCase):
     def setUpClass(cls):
         cls.logger = Logger(path=osp.join(RESULT_DIR, './benchmark.txt'), keep_console=False)
 
-    def check_output_and_grad(self, out_torch, out_custom, grad_torch, grad_custom, atol=1e-8):
+    def check_output_and_grad(self, out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom, atol=1e-8):
         """Check the output and grad"""
         if out_torch is not None:
             if isinstance(out_torch, list):
-                for out, _out in zip(out_torch, out_custom):
+                for out, _out, _out_forward in zip(out_torch, out_custom, out_custom_forward_only):
                     if isinstance(out, torch.Tensor):
                         self.assertTrue(torch.allclose(out, _out, atol=atol))
+                        self.assertTrue(torch.allclose(out, _out_forward, atol=atol))
             else:
                 if isinstance(out_torch, torch.Tensor):
                     self.assertTrue(torch.allclose(out_torch, out_custom, atol=atol))
+                    self.assertTrue(torch.allclose(out_torch, out_custom_forward_only, atol=atol))
 
         if grad_torch is not None:
             if isinstance(grad_torch, list):
@@ -54,11 +56,11 @@ class TestDict(unittest.TestCase):
 
         add_matrix_custom = AddMatrix()
 
-        out_torch, out_custom, grad_torch, grad_custom = log_custom_benchmark(
+        out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom = log_custom_benchmark(
             self.logger, 'Add Matrix', add_matrix_torch, add_matrix_custom, inputs
         )
 
-        self.check_output_and_grad(out_torch, out_custom, grad_torch, grad_custom)
+        self.check_output_and_grad(out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom)
 
     def tests_scale_exp(self):
         inputs = [torch.rand((1000, 2000), dtype=torch.double, requires_grad=True)]
@@ -71,11 +73,11 @@ class TestDict(unittest.TestCase):
 
         scale_exp_custom = ScaleExp(scale, bias)
 
-        out_torch, out_custom, grad_torch, grad_custom = log_custom_benchmark(
+        out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom = log_custom_benchmark(
             self.logger, 'Scale Exp', scale_exp_torch, scale_exp_custom, inputs
         )
 
-        self.check_output_and_grad(out_torch, out_custom, grad_torch, grad_custom)
+        self.check_output_and_grad(out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom)
 
     def tests_gradcheck_add_matrix(self):
         if not torch.cuda.is_available():
