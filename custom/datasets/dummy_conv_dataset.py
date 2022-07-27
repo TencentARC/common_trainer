@@ -8,7 +8,7 @@ from common.utils.registry import DATASET_REGISTRY
 
 @DATASET_REGISTRY.register()
 class DummyConv(BaseDataset):
-    """Dummpy Conv dataset for conv network"""
+    """Dummy Conv dataset for conv network"""
 
     def __init__(self, cfgs, data_dir, mode, transforms):
         super(DummyConv, self).__init__(cfgs, data_dir, mode, transforms)

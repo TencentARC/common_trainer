@@ -15,10 +15,10 @@ class TestDict(unittest.TestCase):
         self.cfgs = setup_test_config()
         self.model = build_model(self.cfgs, None)
         self.batch_size = 2
-        self.input = self.set_dummpy_input()
+        self.input = self.set_dummy_input()
 
-    def set_dummpy_input(self):
-        """Set dummpy input for model"""
+    def set_dummy_input(self):
+        """Set dummy input for model"""
         input = torch.zeros(size=(self.batch_size, 3, 10, 10))
 
         return input

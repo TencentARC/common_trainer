@@ -17,10 +17,10 @@ class TestDict(unittest.TestCase):
         self.eval_metric = build_metric(self.cfgs, None)
         self.metric_summary = MetricDictCounter()
         self.batch_size = 2
-        self.inputs, self.output = self.setup_dummpy_var()
+        self.inputs, self.output = self.setup_dummy_var()
 
-    def setup_dummpy_var(self):
-        """Set up dummpy inputs and output for testing"""
+    def setup_dummy_var(self):
+        """Set up dummy inputs and output for testing"""
         inputs = {'gt': torch.zeros(size=(self.batch_size, 1, 10, 10))}
         output = {'img': torch.zeros(size=(self.batch_size, 1, 10, 10))}
 
