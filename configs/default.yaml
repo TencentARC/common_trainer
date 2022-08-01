@@ -35,6 +35,7 @@ optim:
         lr_gamma: 0.1               # for ExponentialLR, MultiStepLR, PolyLR
         lr_steps: [50, 80]          # for ExponentialLR(Use first), MultiStepLR(Use all), PolyLR(Use all)
         tmax: 20                    # for CosineAnnealingLR
+        ema_min: 1e-3               # for CosineAnnealingLR
         min_factor: 0.1             # for WarmUpCosineLR
 
     clip_gradients: 0.0             # grad clipping set for init
