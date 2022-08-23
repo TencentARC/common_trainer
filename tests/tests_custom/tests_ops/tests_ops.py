@@ -22,6 +22,8 @@ class TestDict(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.logger = Logger(path=osp.join(RESULT_DIR, './benchmark.txt'), keep_console=False)
+        cls.batch_size = 1024 * 4
+        cls.n_sample = 2048 * 4
 
     def check_output_and_grad(self, out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom, atol=1e-8):
         """Check the output and grad"""
@@ -47,8 +49,8 @@ class TestDict(unittest.TestCase):
 
     def tests_add_matrix(self):
         inputs = [
-            torch.rand((1000, 2000), dtype=torch.double, requires_grad=True),
-            torch.rand((1000, 2000), dtype=torch.double, requires_grad=True)
+            torch.rand((self.batch_size, self.n_sample), dtype=torch.double, requires_grad=True),
+            torch.rand((self.batch_size, self.n_sample), dtype=torch.double, requires_grad=True)
         ]
 
         def add_matrix_torch(x, y):
@@ -63,7 +65,7 @@ class TestDict(unittest.TestCase):
         self.check_output_and_grad(out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom)
 
     def tests_scale_exp(self):
-        inputs = [torch.rand((1000, 2000), dtype=torch.double, requires_grad=True)]
+        inputs = [torch.rand((self.batch_size, self.n_sample), dtype=torch.double, requires_grad=True)]
 
         scale = 3.3
         bias = 2.89
