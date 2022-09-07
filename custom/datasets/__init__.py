@@ -42,9 +42,11 @@ def get_dataset(cfgs, data_dir, logger, mode='train', transfroms=None):
 
 def get_model_feed_in(inputs, device):
     """Get core model feed in."""
-    feed_in = inputs['img']
-    if device == 'gpu':
-        feed_in = feed_in.cuda(non_blocking=True)
+    feed_in = {}
+    for key in ['img', 'gt']:
+        feed_in[key] = inputs[key]
+        if device == 'gpu':
+            feed_in[key] = feed_in[key].cuda(non_blocking=True)
 
     batch_size = inputs['img'].shape[0]
 

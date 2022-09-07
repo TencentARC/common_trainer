@@ -14,6 +14,7 @@ class ConvModel(BaseModel):
         self.conv = ConvBNRelu(in_channels=cfgs.model.in_channel, out_channels=cfgs.model.out_channel)
 
     def forward(self, x):
-        output = {'img': self.conv(x)}
+        img = x['img']
+        output = {'img': self.conv(img)}
 
         return output
