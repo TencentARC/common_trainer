@@ -12,7 +12,7 @@
 #include "helper.h"
 
 
-// The real cuda forward_kernel. This use the ptr version, but does seems to be faster.
+// The real cuda forward_kernel. This use the ptr version, but does not seems to be faster.
 template <typename scalar_t>
 __global__ void forward_kernel(
     const scalar_t* __restrict__ A,
