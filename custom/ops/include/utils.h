@@ -4,6 +4,9 @@
 //
 // utils func
 
+#ifdef UTILS_H
+#define UTILS_H
+
 #include <cuda_runtime.h>
 
 #include <torch/extension.h>
@@ -31,3 +34,5 @@ T* vec_to_gpu(const std::vector<T> vec_cpu) {
 
     return vec_gpu;
 }
+
+#endif
