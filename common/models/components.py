@@ -11,6 +11,7 @@ class ConvBNRelu(nn.Module):
     def __init__(
         self, in_channels, out_channels, kernel_size=1, stride=1, dilation=1, padding=0, groups=1, bn=True, relu=True
     ):
+        """Init conv2d-bn-relu module. BN, Relu is optional"""
         super(ConvBNRelu, self).__init__()
 
         self.do_bn = bn

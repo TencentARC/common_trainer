@@ -44,6 +44,7 @@ class BasicBlock(nn.Module):
         dilation: int = 1,
         norm_layer: Optional[Callable[..., nn.Module]] = None
     ) -> None:
+        """Init function for basic block"""
         super(BasicBlock, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -71,6 +72,7 @@ class BasicBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
+        # downsample
         if self.downsample is not None:
             identity = self.downsample(x)
 
@@ -100,6 +102,7 @@ class Bottleneck(nn.Module):
         dilation: int = 1,
         norm_layer: Optional[Callable[..., nn.Module]] = None
     ) -> None:
+        """Init function for bottleneck module in resnet"""
         super(Bottleneck, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -151,6 +154,7 @@ class ResNet(nn.Module):
         replace_stride_with_dilation: Optional[List[bool]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None
     ) -> None:
+        """Init function for resnet"""
         super(ResNet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -178,6 +182,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2])
 
+        # init weights
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
@@ -261,6 +266,8 @@ def _resnet(
 ) -> ResNet:
     """Get result by config setting"""
     model = ResNet(block, layers, **kwargs)
+
+    # load the pretrained weights from url or load address
     if pretrained:
         if path is None:
             state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
@@ -302,6 +309,7 @@ resnet_spec = {
     }
 }
 
+# pytorch offical pretrained weights
 model_urls = {
     'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
     'resnet34': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
