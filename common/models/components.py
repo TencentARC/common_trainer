@@ -35,6 +35,7 @@ class ConvBNRelu(nn.Module):
         self.init_weight()
 
     def forward(self, x):
+        """Forward x in (B, C, W, H)"""
         x = self.conv2d(x)
         if self.do_bn:
             x = self.batch_norm(x)
@@ -43,6 +44,7 @@ class ConvBNRelu(nn.Module):
         return x
 
     def init_weight(self):
+        """Init weights. """
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
@@ -65,6 +67,7 @@ class SEBlock(nn.Module):
         self.input_channels = input_channels
 
     def forward(self, inputs):
+        """Forward x in (B, C, W, H)"""
         x = F.avg_pool2d(inputs, kernel_size=inputs.size(3))
         x = self.down(x)
         x = F.relu(x)

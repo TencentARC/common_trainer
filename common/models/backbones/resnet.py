@@ -61,6 +61,7 @@ class BasicBlock(nn.Module):
         self.stride = stride
 
     def forward(self, x: Tensor) -> Tensor:
+        """For x in (B, C, W, H)"""
         identity = x
 
         out = self.conv1(x)
@@ -115,6 +116,7 @@ class Bottleneck(nn.Module):
         self.stride = stride
 
     def forward(self, x: Tensor) -> Tensor:
+        """For x in (B, C, W, H)"""
         identity = x
 
         out = self.conv1(x)
@@ -201,6 +203,7 @@ class ResNet(nn.Module):
         stride: int = 1,
         dilate: bool = False
     ) -> nn.Sequential:
+        """Make layers in group"""
         norm_layer = self._norm_layer
         downsample = None
         previous_dilation = self.dilation
@@ -256,6 +259,7 @@ def _resnet(
     arch: str, block: Type[Union[BasicBlock, Bottleneck]], layers: List[int], pretrained: bool, path: str,
     progress: bool, **kwargs: Any
 ) -> ResNet:
+    """Get result by config setting"""
     model = ResNet(block, layers, **kwargs)
     if pretrained:
         if path is None:
@@ -308,6 +312,7 @@ model_urls = {
 
 
 def get_resnet(level, pretrained, output_channel=None, path=None, **kwargs):
+    """Core get function for resnet backbone"""
     assert level in ['18', '34', '50', '101', '152'], 'No level {} in resnet arch...'.format(level)
     arch = 'resnet{}'.format(level)
     model = _resnet(

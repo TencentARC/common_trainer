@@ -27,6 +27,7 @@ class TestDict(unittest.TestCase):
 
     def check_output_and_grad(self, out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom, atol=1e-8):
         """Check the output and grad"""
+        # check output match
         if out_torch is not None:
             if isinstance(out_torch, list):
                 for out, _out, _out_forward in zip(out_torch, out_custom, out_custom_forward_only):
@@ -38,6 +39,7 @@ class TestDict(unittest.TestCase):
                     self.assertTrue(torch.allclose(out_torch, out_custom, atol=atol))
                     self.assertTrue(torch.allclose(out_torch, out_custom_forward_only, atol=atol))
 
+        # check grad match
         if grad_torch is not None:
             if isinstance(grad_torch, list):
                 for grad, _grad in zip(grad_torch, grad_custom):
@@ -48,6 +50,7 @@ class TestDict(unittest.TestCase):
                     self.assertTrue(torch.allclose(grad_torch, grad_custom, atol=atol))
 
     def tests_add_matrix(self):
+        """Tests the add_matrix customized function"""
         inputs = [
             torch.rand((self.batch_size, self.n_sample), dtype=torch.double, requires_grad=True),
             torch.rand((self.batch_size, self.n_sample), dtype=torch.double, requires_grad=True)
@@ -65,6 +68,7 @@ class TestDict(unittest.TestCase):
         self.check_output_and_grad(out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom)
 
     def tests_scale_exp(self):
+        """Tests the scale_exp customized function"""
         inputs = [torch.rand((self.batch_size, self.n_sample), dtype=torch.double, requires_grad=True)]
 
         scale = 3.3
@@ -82,6 +86,7 @@ class TestDict(unittest.TestCase):
         self.check_output_and_grad(out_torch, out_custom, out_custom_forward_only, grad_torch, grad_custom)
 
     def tests_gradcheck_add_matrix(self):
+        """Tests the add_matrix customized for grad"""
         if not torch.cuda.is_available():
             return
 
@@ -95,6 +100,7 @@ class TestDict(unittest.TestCase):
         self.assertTrue(gradcheck(add_matrix_custom, inputs, eps=1e-6, atol=1e-8))
 
     def tests_gradcheck_scale_exp(self):
+        """Tests the scale_exp customized for grad"""
         if not torch.cuda.is_available():
             return
 
