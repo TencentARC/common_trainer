@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=low-comment-ratio
 # Adapting from torchvision: https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 
 from typing import Any, Callable, List, Optional, Type, Union
