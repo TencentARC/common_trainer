@@ -97,9 +97,11 @@ class BasicBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
+        # downsample
         if self.downsample is not None:
             identity = self.downsample(x)
 
+        # straight cut
         out += identity
         out = self.relu(out)
 
@@ -168,9 +170,11 @@ class Bottleneck(nn.Module):
         out = self.conv3(out)
         out = self.bn3(out)
 
+        # downsaple
         if self.downsample is not None:
             identity = self.downsample(x)
 
+        # straight cut
         out += identity
         out = self.relu(out)
 
@@ -222,6 +226,8 @@ class ResNet(nn.Module):
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+
+        # make groups
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
@@ -327,6 +333,7 @@ def _resnet(
 
 # Detail selection of resnet model
 resnet_spec = {
+    # basic block for shallow model
     'resnet18': {
         'block': BasicBlock,
         'layers': [2, 2, 2, 2],
@@ -337,6 +344,7 @@ resnet_spec = {
         'layers': [3, 4, 6, 3],
         'exp': 1
     },
+    # bottleneck for larger model
     'resnet50': {
         'block': Bottleneck,
         'layers': [3, 4, 6, 3],
@@ -368,6 +376,8 @@ def get_resnet(level, pretrained, output_channel=None, path=None, **kwargs):
     """Core get function for resnet backbone"""
     assert level in ['18', '34', '50', '101', '152'], 'No level {} in resnet arch...'.format(level)
     arch = 'resnet{}'.format(level)
+
+    # make the backbone model
     model = _resnet(
         arch, resnet_spec[arch]['block'], resnet_spec[arch]['layers'], pretrained=pretrained, path=path, progress=False
     )
