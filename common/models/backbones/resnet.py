@@ -72,7 +72,6 @@ class BasicBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
-        # downsample
         if self.downsample is not None:
             identity = self.downsample(x)
 
@@ -154,7 +153,17 @@ class ResNet(nn.Module):
         replace_stride_with_dilation: Optional[List[bool]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None
     ) -> None:
-        """Init function for resnet"""
+        """Init function for resnet
+        'resnet18': {'block': BasicBlock, 'layers': [2, 2, 2, 2], 'exp': 1},
+        Args:
+            block: BasicBlock or Bottleneck for each block
+            layers: list of layers for each block
+            zero_init_residual: zero init last BN
+            groups: group for conv layer
+            width_per_group: group conv channel
+            replace_stride_with_dilation:
+            norm_layer: batchNorm or groupNorm
+        """
         super(ResNet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
