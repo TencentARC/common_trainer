@@ -222,12 +222,14 @@ class ResNet(nn.Module):
             )
         self.groups = groups
         self.base_width = width_per_group
+
+        # init block
         self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False)
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
-        # make groups
+        # make other blocks
         self.layer1 = self._make_layer(block, 64, layers[0])
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0])
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1])
@@ -273,12 +275,15 @@ class ResNet(nn.Module):
             )
 
         layers = []
+        # init block
         layers.append(
             block(
                 self.inplanes, planes, stride, downsample, self.groups, self.base_width, previous_dilation, norm_layer
             )
         )
         self.inplanes = planes * block.expansion
+
+        # blocks
         for _ in range(1, blocks):
             layers.append(
                 block(
@@ -294,12 +299,13 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def _forward_impl(self, x: Tensor) -> Tensor:
-        # See note [TorchScript super()]
+        # init layer
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
 
+        # blocks
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
@@ -322,7 +328,6 @@ def _resnet(
     if pretrained:
         if path is None:
             state_dict = load_state_dict_from_url(model_urls[arch], progress=progress)
-
         else:
             state_dict = torch.load(path, map_location='cpu')
 
@@ -374,6 +379,8 @@ model_urls = {
 
 def get_resnet(level, pretrained, output_channel=None, path=None, **kwargs):
     """Core get function for resnet backbone"""
+
+    # select the main size, only few arch allowed
     assert level in ['18', '34', '50', '101', '152'], 'No level {} in resnet arch...'.format(level)
     arch = 'resnet{}'.format(level)
 
