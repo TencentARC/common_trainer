@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=low-comment-ratio
 # Adapting from torchvision: https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 
 from typing import Any, Callable, List, Optional, Type, Union
@@ -13,7 +12,15 @@ from common.models.components import ConvBNRelu
 
 
 def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, dilation: int = 1) -> nn.Conv2d:
-    """3x3 convolution with padding"""
+    """3x3 convolution with padding
+
+    Args:
+        in_planes: input channel size
+        out_planes: output channel size
+        stride: stride for conv, by default 1
+        groups: group num for conv, by default 1
+        dilation: dialtion for conv, by default 1
+    """
     return nn.Conv2d(
         in_planes,
         out_planes,
@@ -27,7 +34,13 @@ def conv3x3(in_planes: int, out_planes: int, stride: int = 1, groups: int = 1, d
 
 
 def conv1x1(in_planes: int, out_planes: int, stride: int = 1) -> nn.Conv2d:
-    """1x1 convolution"""
+    """1x1 convolution
+
+    Args:
+        in_planes: input channel size
+        out_planes: output channel size
+        stride: stride for conv, by default 1
+    """
     return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
 
@@ -45,7 +58,18 @@ class BasicBlock(nn.Module):
         dilation: int = 1,
         norm_layer: Optional[Callable[..., nn.Module]] = None
     ) -> None:
-        """Init function for basic block"""
+        """Init function for basic block
+
+        Args:
+            inplanes: input channel size
+            planes: output channel size
+            stride: stride for conv, by default 1
+            downsample: downsample or not
+            groups: group num for conv, by default 1
+            base_width: actually not use here
+            dilation: dialtion for conv, by default 1
+            norm_layer: batchnorm or groupnorm
+        """
         super(BasicBlock, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -102,7 +126,18 @@ class Bottleneck(nn.Module):
         dilation: int = 1,
         norm_layer: Optional[Callable[..., nn.Module]] = None
     ) -> None:
-        """Init function for bottleneck module in resnet"""
+        """Init function for bottleneck module in resnet
+
+        Args:
+            inplanes: input channel size
+            planes: output channel size
+            stride: stride for conv, by default 1
+            downsample: downsample or not
+            groups: group num for conv, by default 1
+            base_width: used for group conv
+            dilation: dialtion for conv, by default 1
+            norm_layer: batchnorm or groupnorm
+        """
         super(Bottleneck, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
